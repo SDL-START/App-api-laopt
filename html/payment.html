@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>LaoSPT Insurance</title>
+    <style>
+      * {
+        font-family: "Consolas", monospace;
+      }
+      body {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        background-color: #eee;
+      }
+      .container {
+        height: auto;
+        margin: auto;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-top: 8px solid #c6332a;
+        top: 0px;
+        position: relative;
+        box-shadow: 0 3px 5px #ccc;
+        text-align: center;
+        padding-bottom: 20px;
+      }
+      h2,
+      h3 {
+        padding: 0;
+        margin: 0;
+        color: #333;
+      }
+      .title {
+        padding: 20px 0;
+        color: #333;
+      }
+      .border {
+        border-bottom: 2px solid #c6332a;
+        width: 40%;
+        margin: auto;
+      }
+      .btn-payment {
+        border: none;
+        outline: none;
+        padding: 14px 40px;
+        color: #fff;
+        background-color: #c6332a;
+        border-radius: 3px;
+        font-size: 15px;
+        cursor: pointer;
+        box-shadow: 0 3px 3px #ccc;
+        margin-top: 20px;
+      }
+      .btn-payment:hover {
+        background-color: #b12d27;
+      }
+      .details {
+        padding: 20px;
+      }
+      p {
+        padding: 1px 0;
+        line-height: 0.4rem;
+      }
+      .amount {
+        padding-top: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="title">
+        <h1>Payment Gateway</h1>
+        <div class="border"></div>
+      </div>
+      <div class="content">
+        <form id="form" action="https://bcel.la:8084/checkout" method="post">
+          <div class="details">
+            <div>
+              <h3>Billing Information</h3>
+              <div>
+                <p id="name"></p>
+                <p id="address"></p>
+                <p id="phone"></p>
+                <p id="email"></p>
+              </div>
+            </div>
+            <div class="amount">
+              <h3>Amount: <span id="amount"></span> <span id="ccy" style="text-transform: uppercase"></span></h3>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
+<script src="crypto-js/hmac-sha256.js"></script>
+<script src="crypto-js/enc-base64-min.js"></script>
+<script type="text/javascript">
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+
+  const sid = RandomNumber();
+  // const access_key = "adcb8ef4dce43ccd848b73328c06e838";
+  const access_key = "1UKhExAXJErYYV/2TRfOefMah6Dh1bpNpGfOjGtws3U=";
+  // const profile_id = "428DA54F-3070-4625-A837-8889F844DF0D";
+  const profile_id = "1682";
+  // const secret_key = `3bbccae275fc4931906df210991e3b05116e1fd8b4e9434586d5974df292cd21777b1061859249c3893de204ee860a4f28c553a2cd58494094c28af8cabac01c54a464b83c704ad58e8d24cebbad1b609880442f16d646f6918007efc2ca19a666fb9f4426954182a53c0c1fa345b5210849e7f18f3a487d90d79d7308c16531`;
+  const secret_key = `0b3bc10d21655fa6bfc935fcec883fcb68ccc415383a4f32ade6d06e957e354c652e1a5e344fe990afa1a1ef23127619af79ae89f2c2abf5b7ae5b21496b0d6f`;
+  // const merchant_id = "bcel_test_account";
+  const merchant_id = "";
+  const params = [];
+  params["access_key"] = access_key;
+  params["profile_id"] = profile_id;
+  params["transaction_uuid"] = uniqid();
+  params["signed_date_time"] = gmdate();
+  params["locale"] = "en";
+  params["transaction_type"] = "authorization";
+  params["reference_number"] = urlParams.get("merchant_secure_data1");
+  params["currency"] = "LAK";
+
+  params["device_fingerprint_id"] = sid;
+
+  params["amount"] = urlParams.get("amount");
+  params["bill_to_address_country"] = urlParams.get("countrycode");
+  params["bill_to_forename"] = urlParams.get("firstname"); //"Khamla";
+  params["bill_to_surname"] = urlParams.get("lastname"); //"AKAT";
+  params["bill_to_email"] = urlParams.get("email"); //"k.rattanavong@gmail.com";
+  params["bill_to_phone"] = urlParams.get("phone"); //"2055579888";
+  params["bill_to_address_city"] = urlParams.get("city"); // "Vientiane";
+  params["bill_to_address_line1"] = urlParams.get("address"); // "1/23 Somewhere";
+  params["bill_to_address_postal_code"] = urlParams.get("postalcode") ? urlParams.get("postalcode") : "00000"; // "01000";
+  params["merchant_secure_data1"] = urlParams.get("merchant_secure_data1") ? urlParams.get("merchant_secure_data1") : "-"; // "special message 1";
+  params["merchant_secure_data2"] = urlParams.get("merchant_secure_data2") ? urlParams.get("merchant_secure_data2") : "-"; // "special data 2";
+  params["merchant_secure_data3"] = urlParams.get("merchant_secure_data3") ? urlParams.get("merchant_secure_data3") : "-"; // "special data 3";
+  params["signed_field_names"] = "";
+  params["signed_field_names"] = implode(params);
+  params["signature"] = signParams(params, secret_key);
+
+  // set preview billing address
+  document.getElementById("name").innerHTML = params["bill_to_forename"] + " " + params["bill_to_surname"];
+  document.getElementById("address").innerHTML =
+    params["bill_to_address_line1"] +
+    ", " +
+    params["bill_to_address_city"] +
+    ", " +
+    params["bill_to_address_postal_code"] +
+    ", " +
+    params["bill_to_address_country"];
+  document.getElementById("phone").innerHTML = params["bill_to_phone"];
+  document.getElementById("email").innerHTML = params["bill_to_email"];
+  document.getElementById("amount").innerHTML = params["amount"];
+  document.getElementById("ccy").innerHTML = params["currency"];
+
+  // set form data
+  var form = document.getElementById("form");
+  for (field in params) {
+    form.innerHTML += "<input type='hidden' name='" + field + "' value='" + params[field] + "'/>";
+  }
+  form.innerHTML += "<input class='btn-payment' type='submit' value='Make Payment'/>";
+
+  function signParams(params, secret_key) {
+    var dataToSign = [];
+    var joinedData = "";
+    var signedFieldNames = params["signed_field_names"].split(",");
+
+    signedFieldNames.forEach(function (field) {
+      dataToSign.push(field + "=" + params[field]);
+    });
+    joinedData = implode(dataToSign, "v");
+
+    var hash = CryptoJS.HmacSHA256(joinedData, secret_key);
+    var hashInBase64 = CryptoJS.enc.Base64.stringify(hash);
+    return hashInBase64;
+  }
+
+  function implode(params, type) {
+    var keys = [];
+    for (key in params) {
+      if (type == "v") keys.push(params[key]);
+      else keys.push(key);
+    }
+    return keys.join();
+  }
+
+  function uniqid(prefix, moreEntropy) {
+    if (typeof prefix === "undefined") prefix = "";
+
+    var retId;
+    var _formatSeed = function (seed, reqWidth) {
+      seed = parseInt(seed, 10).toString(16); // to hex str
+      if (reqWidth < seed.length) {
+        // so long we split
+        return seed.slice(seed.length - reqWidth);
+      }
+      if (reqWidth > seed.length) {
+        // so short we pad
+        return Array(1 + (reqWidth - seed.length)).join("0") + seed;
+      }
+      return seed;
+    };
+
+    var $global = typeof window !== "undefined" ? window : global;
+    $global.$locutus = $global.$locutus || {};
+    var $locutus = $global.$locutus;
+    $locutus.php = $locutus.php || {};
+
+    if (!$locutus.php.uniqidSeed) {
+      // init seed with big random int
+      $locutus.php.uniqidSeed = Math.floor(Math.random() * 0x75bcd15);
+    }
+    $locutus.php.uniqidSeed++;
+
+    // start with prefix, add current milliseconds hex string
+    retId = prefix;
+    retId += _formatSeed(parseInt(new Date().getTime() / 1000, 10), 8);
+    // add seed hex string
+    retId += _formatSeed($locutus.php.uniqidSeed, 5);
+    if (moreEntropy) {
+      // for more entropy we add a float lower to 10
+      retId += (Math.random() * 10).toFixed(8).toString();
+    }
+
+    return retId;
+  }
+
+  function gmdate() {
+    var today = new Date();
+    today = today.toISOString();
+    start = today.substring(0, today.indexOf(".") + 0);
+    end = today.substring(today.indexOf(".") + 4);
+    return start + end;
+  }
+
+  function RandomNumber() {
+    return Math.floor(100000 + Math.random() * 900000);
+  }
+</script>

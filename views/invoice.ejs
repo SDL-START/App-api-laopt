@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>COVID-19 PT CARE INSURANCE INVOICE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./images/fonts/noto-sans-lao/stylesheet.css">
+    <style>
+        body {
+            position: relative;
+            margin: 0;
+            padding: 0;
+            width: 210mm;
+            height: 297mm;
+            font-family: Noto Sans Lao;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+                padding: 0;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <%
+    function formatMoney(amount) {
+        if (!amount) amount = 0;
+        if (typeof amount === 'string') {
+            amount = parseFloat(amount)
+        }
+        const amt = amount.toLocaleString('de-DE', {
+            style: 'currency',
+            currency: 'LAK',
+            currencyDisplay: 'symbol',
+            minimumFractionDigits: 2
+        });
+        let symbol = '₭'
+        return `${amt.split('LAK')[0].trim()}`;
+    }
+
+    function pad(n, width, z) {
+        z = z || '0';
+        n = n + '';
+        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+    }
+    %>
+</head>
+<body>
+<img src="images/invoice_template.jpg" alt="" class="w-full h-full"/>
+<div class="absolute left-0 top-0">
+    <div style="margin-top: 11rem; margin-left: 39.5rem; font-size: 9pt;">
+        <p><%= certificate['no'] %></p>
+        <div style="display: flex; margin-left: 1rem; margin-top: -.3rem;">
+            <p><%= certificate['createdtime'].split('/')[0] %></p>
+            <p class="ml-4"><%= certificate['createdtime'].split('/')[1] %></p>
+            <p class="ml-4"><%= certificate['createdtime'].split('/')[2] %></p>
+        </div>
+    </div>
+    <div style="margin-top: 4.8rem; margin-left: 14rem; white-space: nowrap; font-size: 9pt;">
+        <%= member && member['firstname'] ? member['firstname'] : certificate['user']['firstname'] %>
+        <%= member && member['lastname'] ? member['lastname'] : certificate['user']['lastname'] %>
+    </div>
+    <div class="flex mt-28 ml-16" style="font-size: 9pt;">
+        <div>1</div>
+        <div class="text-red-500 ml-12">LABOR HEALTH INSURANCE FOR FOREIGNERS</div>
+        <div class="ml-24"><%= certificate['type'] === 'SINGLE' ? 1 : '' %></div>
+        <div class="ml-14"><%= certificate['type'] === 'FAMILY' ? 1 : '' %></div>
+        <div class="ml-12"><%= certificate['type'] === 'FAMILY' && !member ? certificate['certificatemember'].length : 1 %></div>
+        <div class="ml-10"><%= formatMoney(Number(certificate.insurancepackage['price'])) %> LAK</div>
+    </div>
+    <div class="text-right font-bold" style="margin-top: 22.6rem; font-size: 9pt;">
+        <p><%= member ? formatMoney(Number(certificate.insurancepackage['price'])) : formatMoney(certificate['amount']) %> LAK</p>
+        <p class="mt-4"><%= certificate['payment'][0]['channel'] %></p>
+    </div>
+    <div style="margin-top: 9.8rem; margin-left: 30rem; white-space: nowrap; font-size: 9pt;">
+        <%= member && member['firstname'] ? member['firstname'] : certificate['user']['firstname'] %>
+        <%= member && member['lastname'] ? member['lastname'] : certificate['user']['lastname'] %>
+    </div>
+    <div class="flex">
+        <div class="flex" style="margin-left: 14rem; margin-top: .4rem; font-size: 9pt;">
+            <p><%= certificate['createdtime'].split('/')[0] %></p>
+            <p class="ml-3"><%= certificate['createdtime'].split('/')[1] %></p>
+            <p class="ml-3"><%= certificate['createdtime'].split('/')[2] %></p>
+        </div>
+        <div class="flex" style="margin-left: 15.5rem; margin-top: .4rem; font-size: 9pt;">
+            <p><%= certificate['createdtime'].split('/')[0] %></p>
+            <p class="ml-3"><%= certificate['createdtime'].split('/')[1] %></p>
+            <p class="ml-3"><%= certificate['createdtime'].split('/')[2] %></p>
+        </div>
+    </div>
+</div>
+<script>
+  window.print();
+</script>
+</body>
+</html>

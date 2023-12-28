@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>COVID-19 PT CARE INSURANCE POLICY SCHEDULE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="qr-code.js"></script>
+  </head>
+  <body class="px-2">
+    <div class="flex">
+      <div class="flex-1">
+        <img src="images/logo-insurance.png" alt="" class="h-20" />
+      </div>
+      <div class="flex-auto">
+        <h1 class="text-xl font-bold text-center">COVID-19 PT CARE</h1>
+        <h1 class="text-xl font-bold text-center">BẢO HIỂM</h1>
+        <h1 class="text-xl font-bold text-center">LỊCH TRÌNH CHÍNH SÁCH</h1>
+      </div>
+      <div class="flex-1"></div>
+    </div>
+
+    <h4 class="pt-4 pb-2 font-bold">THÔNG TIN ĐƯỢC BẢO HIỂM:</h4>
+    <table class="w-full" cellspacing="0" cellpadding="0">
+      <tbody>
+        <tr>
+          <td style="width: 20%" class="px-4 py-2 border">Tên:</td>
+          <td style="width: 30%" class="px-4 py-2 border"><%= certificate['user']['firstname']%></td>
+          <td style="width: 20%" class="px-4 py-2 border" rowspan="9">
+            <div>Policy# <%= certificate['no']%></div>
+            <div>
+              <img src="https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=123&choe=UTF-8" class="w-50 h-50" alt="" />
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 border">Họ:</td>
+          <td class="px-4 py-2 border"><%= certificate['user']['lastname'] %></td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 border">Số hộ chiếu:</td>
+          <td class="px-4 py-2 border"><%= certificate['user']['passport'] %></td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 border">Quốc tịch: Ngày :</td>
+          <td class="px-4 py-2 border"><%= certificate['user']['countrycode'] %></td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 border">sinh:</td>
+          <td class="px-4 py-2 border"><%= certificate['user']['dob'] %></td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 border">Điện thoại:</td>
+          <td class="px-4 py-2 border"><%= certificate['user']['phone'] %></td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 border">Email:</td>
+          <td class="px-4 py-2 border"><%= certificate['user']['email'] %></td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 border">Nghề nghiệp:</td>
+          <td class="px-4 py-2 border"><%= certificate['user']['occupation'] %></td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 border">Địa chỉ nhà</td>
+          <td class="px-4 py-2 border"><%= certificate['user']['address'] %></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4 class="pt-4 pb-2 font-bold">CHI TIẾT BỒI THƯỜNG</h4>
+    <table class="w-full border">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="px-4 py-2 border">Mô tả bìa</th>
+          <th class="px-4 py-2 border">Số tiền bảo hiểm (LAK)</th>
+          <th class="px-4 py-2 border">Phần thưởng (LAK)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="px-4 py-2 border">
+            <div>1) Chi phí y tế</div>
+          </td>
+          <td class="px-4 py-2 border">
+            <div class="h-6"></div>
+          </td>
+          <td class="px-4 py-2 text-center border" rowspan="6">Đã bao gồm</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 border">
+            <div class="px-8">Nhiễm trùng lần 1</div>
+          </td>
+          <td class="px-4 py-2 border">
+            <div class="text-right">3,000,000</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 border">
+            <div class="px-8">Nhiễm trùng thứ 2</div>
+          </td>
+          <td class="px-4 py-2 border">
+            <div class="text-right">5,000,000</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 border">
+            <div class="px-8">Nhiễm trùng lần 3</div>
+          </td>
+          <td class="px-4 py-2 border">
+            <div class="text-right">10,000,000</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 border">
+            <div>2) Bồi thường thiệt hại về nhân mạng</div>
+          </td>
+          <td class="px-4 py-2 border">
+            <div class="text-right">32,000,000</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 border">
+            <div class="font-bold">Tổng chi phí đền bù</div>
+          </td>
+          <td class="px-4 py-2 border">
+            <div class="text-right">50,000,000</div>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot class="bg-gray-200">
+        <tr>
+          <th class="text-right" colspan="2">Tổng cộng</th>
+          <th class="text-right">350,000 LAK</th>
+        </tr>
+      </tfoot>
+    </table>
+
+    <h4 class="pt-4 pb-2 font-bold">TỶ GIÁ</h4>
+    <table class="w-full">
+      <tbody>
+        <tr>
+          <td class="px-4 py-2 border">Phí bảo hiểm bằng USD</td>
+          <td class="px-4 text-right border">30 USD</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 border">Trả phí bằng THB</td>
+          <td class="px-4 text-right border">1000 THB</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 border">Phí bảo hiểm bằng VND</td>
+          <td class="px-4 text-right border">615,000 VND</td>
+        </tr>
+        <tr>
+          <td class="px-4 py-2 border">Đặc biệt trong RBM</td>
+          <td class="px-4 text-right border">200 RMB</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="my-4"></div>
+    <table class="w-full">
+      <tbody>
+        <tr>
+          <th class="border" rowspan="2">Thời gian bảo hiểm (01 năm):</th>
+          <th class="border">Ngày bắt đầu</th>
+          <th class="border">Ngày hết hạn</th>
+        </tr>
+        <tr>
+          <td class="text-center border"><%= certificate['createdtime'] %></td>
+          <td class="text-center border"><%= certificate['expiredtime'] %></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="flex mt-2 mb-8">
+      <div class="flex-1">Kênh:</div>
+      <div class="flex-1">&#9744; LIA</div>
+      <div class="flex-1">&#9744; MÔI</div>
+      <div class="flex-1">&#9744; Đại lý</div>
+    </div>
+
+    <table class="w-full">
+      <tbody>
+        <tr>
+          <th class="pb-32 text-center border">Insee Life Insurance Co., Ltd</th>
+          <th class="pb-32 text-center border">Thavisub Insurance Borker Co., Ltd</th>
+          <th class="pb-32 text-center border">
+            <div>Được bảo hiểm:</div>
+            <div><%= certificate['user']['firstname'] %> <%= certificate['user']['lastname'] %></div>
+          </th>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>

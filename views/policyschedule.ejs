@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>COVID-19 PT CARE INSURANCE POLICY SCHEDULE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            position: relative;
+            margin: 0;
+            padding: 0;
+            width: 210mm;
+            height: 297mm;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+                padding: 0;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <%
+    function formatMoney(amount) {
+        if (!amount) amount = 0;
+        if (typeof amount === 'string') {
+            amount = parseFloat(amount)
+        }
+        const amt = amount.toLocaleString('de-DE', {
+            style: 'currency',
+            currency: 'LAK',
+            currencyDisplay: 'symbol',
+            minimumFractionDigits: 2
+        });
+        let symbol = '₭'
+        return `${amt.split('LAK')[0].trim()}`;
+    }
+
+    function pad(n, width, z) {
+        z = z || '0';
+        n = n + '';
+        return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+    }
+    %>
+</head>
+<body>
+<img src="images/certificate_template.jpg" alt="" class="w-full h-full"/>
+<div class="absolute left-0 top-0">
+    <div class="flex" style="margin-top: 14.5rem; margin-left: 17.5rem;">
+        <div class="flex-shrink-0 w-64 mr-4" style="height: 232px;">
+            <p><%= member ? member['firstname'] : certificate['user']['firstname'] %>&nbsp;</p>
+            <p class="mt-0.5"><%= member ? member['lastname'] : certificate['user']['lastname'] %>&nbsp;</p>
+            <p class=""><%= member ? member['passport'] : certificate['user']['passport'] %>&nbsp;</p>
+            <p class="-mt-0.5"><%= member ? member['countrycode'] : certificate['user']['countrycode'] %>&nbsp;</p>
+            <p class="-mt-0.5"><%= member ? member['dob'] : certificate['user']['dob'] %>&nbsp;</p>
+            <p class=""><%= member ? member['phone'] : '' %>&nbsp;</p>
+            <p class="-mt-0.5"><%= member ? member['email'] : '' %>&nbsp;</p>
+            <p class="">&nbsp;</p>
+            <p class=""><%= member ? certificate['user']['address'] : '' %>&nbsp;</p>
+        </div>
+        <div class="flex-shrink-0 pt-5 relative">
+            <p class="font-bold text-center"><%= certificate['no'] + '-' + member['seq'] %></p>
+            <img src="https://chart.googleapis.com/chart?cht=qr&chs=150x150&chld=L|0&chl=<%= certificate['no'] %><%= member ? '-' + member['seq'] : '' %>&choe=UTF-8"
+                 alt="" class="pt-1 pl-1.5"/>
+        </div>
+    </div>
+    <div class="text-right font-bold" style="margin-top: 15.4rem; padding-right: 0.8rem;">
+        <p><%= formatMoney(Number(certificate.insurancepackage['price'])) %> LAK</p>
+    </div>
+    <div style="margin-top: 1.6rem; margin-left: 11.8rem;">
+        <p>(<%= pad(certificate['expirymonth'], 2, '0') %> <span class="">month</span>)</p>
+        <div class="flex" style="margin-left: 9.3rem; margin-top: -1.4rem;">
+            <div class="flex">
+                <p><%= certificate['createdtime'].split('/')[0] %></p>
+                <p class="ml-6"><%= certificate['createdtime'].split('/')[1] %></p>
+                <p class="ml-6"><%= certificate['createdtime'].split('/')[2] %></p>
+            </div>
+            <div class="flex ml-28">
+                <p><%= certificate['expiredtime'].split('/')[0] %></p>
+                <p class="ml-6"><%= certificate['expiredtime'].split('/')[1] %></p>
+                <p class="ml-6"><%= certificate['expiredtime'].split('/')[2] %></p>
+            </div>
+        </div>
+    </div>
+    <div style="margin-top: 2.6rem; margin-left: 35.5rem; white-space: nowrap;">
+        <%= certificate['user']['firstname'] %> <%= certificate['user']['lastname'] %>
+    </div>
+</div>
+<script>
+  window.print();
+</script>
+</body>
+</html>

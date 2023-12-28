@@ -1,0 +1,686 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model certificate {
+  id                  Int                 @id @default(autoincrement())
+  no                  String              @unique(map: "no_UNIQUE") @db.VarChar(255)
+  createdtime         DateTime            @default(now()) @db.DateTime(0)
+  user_id             Int
+  employee_id         Int?
+  type                certificate_type
+  insurancetype_id    Int
+  insurancepackage_id Int
+  amount              Int?
+  status              certificate_status? @default(PENDING)
+  servicelocation_id  Int?
+  buy_mode            String?             @default("app") @db.VarChar(20)
+  expirytime          DateTime?           @db.DateTime(0)
+  insurancepackage    insurancepackage    @relation(fields: [insurancepackage_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "certificate_insurancepackage_id_fk")
+  insurancetype       insurancetype       @relation(fields: [insurancetype_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "certificate_insurancetype_id_fk")
+  servicelocation     servicelocation?    @relation(fields: [servicelocation_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "certificate_servicelocation_id_fk")
+  user                user                @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_certificate_user1")
+  certificatemember   certificatemember[]
+  claim               claim[]
+  payment             payment[]
+  repayment           repayment[]
+
+  @@index([createdtime], map: "certificate_createdtime_index")
+  @@index([insurancepackage_id], map: "certificate_insurancepackage_id_fk")
+  @@index([insurancetype_id], map: "certificate_insurancetype_id_fk")
+  @@index([servicelocation_id], map: "certificate_servicelocation_id_fk")
+  @@index([user_id], map: "fk_certificate_user1_idx")
+}
+
+model certificatemember {
+  id             Int                        @id @default(autoincrement())
+  firstname      String                     @db.VarChar(255)
+  lastname       String                     @db.VarChar(255)
+  phone          String?                    @db.VarChar(100)
+  email          String?                    @db.VarChar(100)
+  relation       certificatemember_relation
+  certificate_id Int
+  dob            DateTime                   @db.Date
+  gender         certificatemember_gender?
+  photo          Json?
+  passport       String?                    @db.VarChar(200)
+  countrycode    String?                    @db.VarChar(30)
+  province_id    Int?
+  workplace      String?                    @db.VarChar(1000)
+  seq            String?                    @db.VarChar(3)
+  province       province?                  @relation(fields: [province_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "certificatemember_province_id_fk")
+  certificate    certificate                @relation(fields: [certificate_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_certificatemember_certificate1")
+  claim          claim[]
+  visatype_id    Int?
+  visatype       visatype?                  @relation(fields: [visatype_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cmember_visatype_id_fk")
+
+  @@index([province_id], map: "certificatemember_province_id_fk")
+  @@index([certificate_id], map: "fk_certificatemember_certificate1_idx")
+}
+
+model certificatesequence {
+  id          Int      @id @default(autoincrement())
+  code        String   @db.VarChar(100)
+  seq         Int      @default(1)
+  createdtime DateTime @default(now()) @db.DateTime(0)
+}
+
+model claim {
+  id                   Int                @id @default(autoincrement())
+  reqtime              DateTime           @default(now()) @db.DateTime(0)
+  status               claim_status       @default(WAITING)
+  lastupdate           DateTime           @default(now()) @db.DateTime(0)
+  certificate_id       Int?
+  user_id              Int
+  employee_id          Int?
+  type                 String?            @db.VarChar(200)
+  amount               Int?
+  hospital_id          Int?
+  photo                Json?
+  approveddate         DateTime?          @db.Timestamp(0)
+  approvedby           Int?
+  certificatemember_id Int?
+  claim_mode           String?            @default("app") @db.VarChar(20)
+  certificatemember    certificatemember? @relation(fields: [certificatemember_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "claim_certificatemember_id_fk")
+  hospital             hospital?          @relation(fields: [hospital_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "claim_hospital_id_fk")
+  certificate          certificate?       @relation(fields: [certificate_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_claim_certificate1")
+  user                 user               @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_claim_user1")
+  claimlog             claimlog[]
+  repayment            repayment[]
+
+  @@index([certificatemember_id], map: "claim_certificatemember_id_fk")
+  @@index([hospital_id], map: "claim_hospital_id_fk")
+  @@index([certificate_id], map: "fk_claim_certificate1_idx")
+  @@index([employee_id], map: "fk_claim_employee1_idx")
+  @@index([user_id], map: "fk_claim_user1_idx")
+}
+
+model visatype {
+  id                Int                 @id @default(autoincrement())
+  name              String
+  description       String?
+  status            visatype_status     @default(ACTIVE)
+  deleted           Boolean             @default(false)
+  user              user[]
+  certificatemember certificatemember[]
+}
+
+model claimlog {
+  id           Int             @id @default(autoincrement())
+  txtime       DateTime        @default(now()) @db.DateTime(0)
+  status       claimlog_status @default(WAITING)
+  remark       String?         @db.Text
+  claim_id     Int
+  user_id      Int?
+  request_body Json?
+  user         user?           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "claimlog_user_id_fk")
+  claim        claim           @relation(fields: [claim_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_claimlog_claim1")
+
+  @@index([user_id], map: "claimlog_user_id_fk")
+  @@index([claim_id], map: "fk_claimlog_claim1_idx")
+}
+
+model country {
+  id        Int     @id @default(autoincrement())
+  iso       String  @unique(map: "country_code_uindex") @db.VarChar(100)
+  name      String  @db.VarChar(255)
+  nicename  String  @db.VarChar(255)
+  iso3      String? @db.Char(3)
+  numcode   Int?    @db.SmallInt
+  phonecode Int
+}
+
+model district {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(255)
+  province_id Int
+  province    province @relation(fields: [province_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_district_province1")
+
+  @@index([province_id], map: "fk_district_province1_idx")
+}
+
+model employee {
+  id               Int                @id @default(autoincrement())
+  username         String             @unique(map: "username_UNIQUE") @db.VarChar(255)
+  firstname        String             @db.VarChar(255)
+  lastname         String             @db.VarChar(255)
+  password         String             @db.VarChar(255)
+  role             employee_role
+  exchangerate     exchangerate[]
+  hospital         hospital[]
+  insurancepackage insurancepackage[]
+  repayment        repayment[]
+}
+
+model exchangerate {
+  id          Int      @id @default(autoincrement())
+  date        DateTime @db.DateTime(0)
+  lak         Decimal? @db.Decimal(10, 2)
+  thb         Decimal? @db.Decimal(10, 2)
+  usd         Decimal? @db.Decimal(10, 2)
+  cny         Decimal? @db.Decimal(10, 2)
+  employee_id Int
+  employee    employee @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_exchangerate_employee1")
+
+  @@index([employee_id], map: "fk_exchangerate_employee1_idx")
+}
+
+model hospital {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(255)
+  address      String   @db.VarChar(255)
+  tel          String   @db.VarChar(255)
+  hospitaltype String   @db.VarChar(200)
+  employee_id  Int
+  lat          String   @db.VarChar(255)
+  lng          String   @db.VarChar(255)
+  images       Json
+  deleted      Boolean? @default(false)
+  claim        claim[]
+  employee     employee @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_hospital_employee1")
+  user         user[]
+
+  @@index([employee_id], map: "fk_hospital_employee1_idx")
+}
+
+model imageslide {
+  id    Int    @id @default(autoincrement())
+  name  Json
+  url   String @db.Text
+  image String @db.Text
+}
+
+model insurancepackage {
+  id               Int                     @id @default(autoincrement())
+  name             String                  @db.VarChar(1000)
+  price            Decimal                 @db.Decimal(10, 2)
+  currency         String                  @db.VarChar(255)
+  lastupdate       DateTime                @default(now()) @db.DateTime(0)
+  employee_id      Int
+  terms            String                  @db.Text
+  status           insurancepackage_status @default(ACTIVE)
+  orderno          String?                 @db.VarChar(100)
+  insurancetype_id Int?
+  period           Int?                    @default(0)
+  certificate      certificate[]
+  employee         employee                @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_package_employee1")
+  insurancetype    insurancetype?          @relation(fields: [insurancetype_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "insurancepackage_insurancetype_id_fk")
+
+  @@index([employee_id], map: "fk_package_employee1_idx")
+  @@index([insurancetype_id], map: "insurancepackage_insurancetype_id_fk")
+}
+
+model insurancetype {
+  id               Int                  @id @default(autoincrement())
+  name             String               @db.VarChar(1000)
+  photo            String?              @db.VarChar(1000)
+  deleted          Boolean              @default(false)
+  status           insurancetype_status @default(ACTIVE)
+  orderno          String?              @db.VarChar(100)
+  description      String?              @db.Text
+  certificate      certificate[]
+  insurancepackage insurancepackage[]
+}
+
+model language {
+  id   Int    @id @default(autoincrement())
+  code String @unique(map: "language_code_uindex") @db.VarChar(100)
+  name Json?
+}
+
+model menu {
+  id        Int           @id @default(autoincrement())
+  name      Json
+  icon      String        @db.Text
+  iswebview Int           @default(0) @db.TinyInt
+  url       String?       @db.Text
+  status    menu_status   @default(ACTIVE)
+  position  Int?
+  platform  menu_platform @default(APP)
+  islogin   Boolean?      @default(true)
+  params    Json?
+  role      menu_role?    @default(USER)
+}
+
+model notifications {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  content     String   @db.VarChar(255)
+  createdtime DateTime @default(now()) @db.DateTime(0)
+}
+
+model otp {
+  id       Int      @id @default(autoincrement())
+  phone    String?  @db.VarChar(255)
+  code     String   @db.VarChar(255)
+  lastsent DateTime @default(now()) @db.DateTime(0)
+  email    String?  @db.VarChar(200)
+  type     otp_type @default(email)
+}
+
+model payment {
+  id             Int         @id @default(autoincrement())
+  createdtime    DateTime    @db.DateTime(0)
+  certificate_id Int
+  user_id        Int
+  channel        String?     @db.VarChar(255)
+  ref            String?     @db.VarChar(255)
+  rawresponse    Json?
+  employee_id    Int?
+  certificate    certificate @relation(fields: [certificate_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_payment_certificate1")
+  user           user        @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_payment_user1")
+
+  @@index([certificate_id], map: "fk_payment_certificate1_idx")
+  @@index([user_id], map: "fk_payment_user1_idx")
+}
+
+model province {
+  id                Int                 @id @default(autoincrement())
+  name              Json
+  certificatemember certificatemember[]
+  district          district[]
+  user              user[]
+}
+
+model purpose {
+  id      Int    @id @default(autoincrement())
+  code    String @db.VarChar(100)
+  name    Json
+  deleted Int    @default(0) @db.TinyInt
+}
+
+model repayment {
+  id             Int               @id @default(autoincrement())
+  txtime         DateTime          @default(now()) @db.DateTime(0)
+  amount         Decimal           @db.Decimal(10, 2)
+  ccy            repayment_ccy
+  ref            String            @db.VarChar(255)
+  channel        repayment_channel
+  remark         String?           @db.Text
+  user_id        Int
+  claim_id       Int
+  employee_id    Int
+  certificate_id Int
+  certificate    certificate       @relation(fields: [certificate_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_repayment_certificate1")
+  claim          claim             @relation(fields: [claim_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_repayment_claim1")
+  employee       employee          @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_repayment_employee1")
+  user           user              @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_repayment_user1")
+
+  @@index([certificate_id], map: "fk_repayment_certificate1_idx")
+  @@index([claim_id], map: "fk_repayment_claim1_idx")
+  @@index([employee_id], map: "fk_repayment_employee1_idx")
+  @@index([user_id], map: "fk_repayment_user1_idx")
+}
+
+model role {
+  role     String  @id @unique(map: "role_role_uindex") @db.VarChar(30)
+  name     String? @db.VarChar(100)
+  details  String? @db.Text
+  isactive Int     @default(1)
+}
+
+model servicelocation {
+  id          Int           @id @default(autoincrement())
+  name        String        @db.VarChar(255)
+  address     String        @db.VarChar(255)
+  tel         String        @db.VarChar(255)
+  lat         String        @db.VarChar(255)
+  lng         String        @db.VarChar(255)
+  images      Json?
+  deleted     Boolean?      @default(false)
+  certificate certificate[]
+  user        user[]
+}
+
+model settings {
+  id    Int    @id @default(autoincrement())
+  name  String @unique(map: "settings_name_uindex") @db.VarChar(255)
+  value Json
+}
+
+model sos_info {
+  id          Int              @id @default(autoincrement())
+  ticketId    Int
+  staffId     Int
+  lat         Float?
+  lng         Float?
+  acc         Float?
+  status      sos_info_status?
+  description String?          @db.VarChar(255)
+  createdAt   DateTime?        @default(now()) @db.DateTime(0)
+  updatedAt   DateTime?        @default(now()) @db.DateTime(0)
+  sos_tickets sos_tickets      @relation(fields: [ticketId], references: [ticketId], onDelete: NoAction, onUpdate: NoAction, map: "sos_info_ibfk_1")
+  user        user             @relation(fields: [staffId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sos_info_ibfk_2")
+
+  @@index([staffId], map: "staffId")
+  @@index([ticketId], map: "ticketId")
+}
+
+model sos_messages {
+  messageId                          Int                        @id @default(autoincrement())
+  ticketId                           Int
+  senderId                           Int
+  receiverId                         Int
+  message                            String?                    @db.VarChar(255)
+  createdAt                          DateTime?                  @default(now()) @db.DateTime(0)
+  updatedAt                          DateTime?                  @default(now()) @db.DateTime(0)
+  isRead                             Boolean?                   @default(false)
+  image                              String?                    @db.VarChar(255)
+  lat                                Float?
+  lng                                Float?
+  message_type                       sos_messages_message_type? @default(TEXT)
+  location_log                       location_log[]
+  sos_tickets                        sos_tickets                @relation(fields: [ticketId], references: [ticketId], onDelete: NoAction, onUpdate: NoAction, map: "sos_messages_ibfk_1")
+  user_sos_messages_senderIdTouser   user                       @relation("sos_messages_senderIdTouser", fields: [senderId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sos_messages_ibfk_2")
+  user_sos_messages_receiverIdTouser user                       @relation("sos_messages_receiverIdTouser", fields: [receiverId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sos_messages_ibfk_3")
+
+  @@index([receiverId], map: "receiverId")
+  @@index([senderId], map: "senderId")
+  @@index([ticketId], map: "ticketId")
+}
+
+model sos_tickets {
+  ticketId                          Int                 @id @default(autoincrement())
+  requesterId                       Int
+  accepterId                        Int?
+  lat                               Float?
+  lng                               Float?
+  acc                               Float?
+  status                            sos_tickets_status? @default(PENDING)
+  createdAt                         DateTime?           @default(now()) @db.DateTime(0)
+  updatedAt                         DateTime?           @default(now()) @db.DateTime(0)
+  description                       String?             @db.VarChar(255)
+  sos_info                          sos_info[]
+  sos_messages                      sos_messages[]
+  user                              user                @relation(fields: [requesterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sos_tickets_ibfk_1")
+  user_sos_tickets_accepterIdTouser user?               @relation("sos_tickets_accepterIdTouser", fields: [accepterId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sos_tickets_ibfk_2")
+
+  @@index([requesterId], map: "requesterId")
+  @@index([accepterId], map: "sos_tickets_ibfk_2_idx")
+}
+
+model translation {
+  id        Int     @id @default(autoincrement())
+  word      String  @unique(map: "translation_word_uindex") @db.VarChar(200)
+  route     String? @db.VarChar(200)
+  translate Json
+
+  @@unique([word, route], map: "translation_word_route_uindex")
+}
+
+model user {
+  id                                         Int                 @id @default(autoincrement())
+  phone                                      String?             @unique(map: "user_phone_uindex") @db.VarChar(255)
+  password                                   String              @db.VarChar(255)
+  firstname                                  String              @db.VarChar(255)
+  lastname                                   String              @db.VarChar(255)
+  registerdate                               DateTime            @default(now()) @db.DateTime(0)
+  photo                                      String?             @db.LongText
+  gender                                     user_gender         @default(MALE)
+  passport                                   String?             @db.VarChar(255)
+  visatype_id                                Int?
+  visatype                                   visatype?           @relation(fields: [visatype_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_visatype_id_fk")
+  status                                     user_status         @default(ACTIVE)
+  dob                                        DateTime            @db.Date
+  email                                      String?             @unique(map: "user_email_uindex") @db.VarChar(255)
+  province_id                                Int?
+  token                                      String?             @db.VarChar(255)
+  idtype                                     user_idtype
+  role                                       user_role           @default(USER)
+  purposeofvisit                             user_purposeofvisit @default(TOUR)
+  resident                                   String?             @db.VarChar(1000)
+  workplace                                  String?             @db.VarChar(1000)
+  street                                     String?             @db.VarChar(1000)
+  city                                       String?             @db.VarChar(1000)
+  address                                    String?             @db.VarChar(1000)
+  countrycode                                String?             @db.VarChar(100)
+  position                                   String?             @db.VarChar(30)
+  hospital_id                                Int?
+  servicelocation_id                         Int?
+  firebasetoken                              String?             @db.VarChar(1000)
+  register_mode                              String?             @db.VarChar(20)
+  employee_id                                Int?
+  certificate                                certificate[]
+  claim                                      claim[]
+  claimlog                                   claimlog[]
+  payment                                    payment[]
+  repayment                                  repayment[]
+  sos                                        sos[]
+  sos_info                                   sos_info[]
+  sos_messages_sos_messages_senderIdTouser   sos_messages[]      @relation("sos_messages_senderIdTouser")
+  sos_messages_sos_messages_receiverIdTouser sos_messages[]      @relation("sos_messages_receiverIdTouser")
+  sos_tickets                                sos_tickets[]
+  sos_tickets_sos_tickets_accepterIdTouser   sos_tickets[]       @relation("sos_tickets_accepterIdTouser")
+  soslog                                     soslog[]
+  province                                   province?           @relation(fields: [province_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_province1")
+  hospital                                   hospital?           @relation(fields: [hospital_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_hospital_id_fk")
+  servicelocation                            servicelocation?    @relation(fields: [servicelocation_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_servicelocation_id_fk")
+  user                                       user?               @relation("userTouser", fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_user_id_fk")
+  other_user                                 user[]              @relation("userTouser")
+
+  @@index([province_id], map: "fk_user_province1_idx")
+  @@index([hospital_id], map: "user_hospital_id_fk_idx")
+  @@index([servicelocation_id], map: "user_servicelocation_id_index")
+  @@index([employee_id], map: "user_user_id_fk")
+}
+
+model location_log {
+  id           Int          @id @default(autoincrement())
+  messageId    Int
+  lat          Float
+  lng          Float
+  created_at   DateTime?    @default(now()) @db.DateTime(0)
+  updated_at   DateTime?    @default(now()) @db.DateTime(0)
+  sos_messages sos_messages @relation(fields: [messageId], references: [messageId], onDelete: NoAction, onUpdate: NoAction, map: "location_log_ibfk_1")
+
+  @@index([messageId], map: "messageId")
+}
+
+model sos {
+  id       Int        @id @default(autoincrement())
+  userid   Int
+  senttime DateTime   @default(now()) @db.DateTime(0)
+  lat      String     @db.VarChar(200)
+  lng      String     @db.VarChar(200)
+  acc      String?    @db.VarChar(200)
+  message  String?    @db.Text
+  status   sos_status @default(PENDING)
+  user     user       @relation(fields: [userid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sos_user_id_fk")
+  soslog   soslog[]
+
+  @@index([userid], map: "sos_user_id_fk")
+}
+
+model soslog {
+  id     Int           @id @default(autoincrement())
+  txtime DateTime      @default(now()) @db.DateTime(0)
+  userid Int
+  status soslog_status
+  remark String?       @db.Text
+  photo  Json?
+  sosid  Int?
+  sos    sos?          @relation(fields: [sosid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "soslog_sos_id_fk")
+  user   user          @relation(fields: [userid], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "soslog_user_id_fk")
+
+  @@index([sosid], map: "soslog_sos_id_fk")
+  @@index([userid], map: "soslog_user_id_fk")
+}
+
+enum visatype_status {
+  ACTIVE
+  HIDDEN
+}
+
+enum claim_status {
+  WAITING
+  PROCESSING
+  APPROVED
+  REJECTED
+  PAID
+  CANCELLED
+  COMPLETED
+  CLOSED
+}
+
+enum claimlog_status {
+  WAITING
+  PROCESSING
+  APPROVED
+  REJECTED
+  PAID
+  COMMENT
+  CANCELLED
+  COMPLETED
+  CLOSED
+  UPDATE
+}
+
+enum certificatemember_relation {
+  HEAD
+  COUPLE
+  CHILDREN
+  PARENTS
+  FRIENDS
+  OTHER
+}
+
+enum repayment_ccy {
+  LAK
+  USD
+  THB
+  CNY
+}
+
+enum insurancetype_status {
+  ACTIVE
+  HIDDEN
+}
+
+enum certificate_type {
+  SINGLE
+  FAMILY
+}
+
+enum employee_role {
+  ADMIN
+}
+
+enum menu_status {
+  ACTIVE
+  HIDDEN
+  DELETED
+}
+
+enum otp_type {
+  email
+  phone
+}
+
+enum repayment_channel {
+  ACCOUNT
+  WALLET
+  CASH
+}
+
+enum sos_tickets_status {
+  PENDING
+  INPROGRESS
+  COMPLETED
+  CANCELED
+}
+
+enum sos_info_status {
+  PENDING
+  INPROGRESS
+  COMPLETED
+  CANCELED
+}
+
+enum insurancepackage_status {
+  ACTIVE
+  HIDDEN
+}
+
+enum menu_platform {
+  APP
+  WEB
+}
+
+enum user_gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum certificate_status {
+  PENDING
+  PAID
+  DELETED
+  CANCELLED
+}
+
+enum user_status {
+  LOCKED
+  ACTIVE
+  CLOSED
+  INACTIVE
+}
+
+enum menu_role {
+  USER
+  STAFF
+}
+
+enum user_idtype {
+  PASSPORT
+  ID
+  VACCINE
+  OTHERS
+}
+
+enum user_role {
+  USER
+  ADMIN
+  STAFF
+  SELLER
+  CLAIMER
+  ACCOUNTING
+}
+
+enum user_purposeofvisit {
+  WORK30
+  WORK
+  TOUR
+}
+
+enum sos_messages_message_type {
+  TEXT
+  FILE
+  LOCATION
+  LIVE_LOCATION
+}
+
+enum certificatemember_gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum soslog_status {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+enum sos_status {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}

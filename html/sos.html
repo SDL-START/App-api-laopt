@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>LaoPT - SOS</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.0"></script>
+  </head>
+  <body>
+    <div id="app">
+      <img src="sos.jpg" alt="" style="width: 100%" />
+      <!-- <p class="text-center">Sending current location to system</p> -->
+      <div class="block px-16 mt-16">
+        <div class="py-4 my-4 text-xl text-center text-white bg-red-600 rounded-lg" @click="send('Help me urgent')">Help me urgent</div>
+        <div class="py-4 my-4 text-xl text-center text-white bg-red-600 rounded-lg" @click="send('Please call me')">Please call me</div>
+      </div>
+    </div>
+    <script>
+      new Vue({
+        el: "#app",
+        name: "sos",
+        data: {
+          interval: null,
+          items: null,
+          message: null,
+        },
+        mounted() {
+          window.addEventListener("flutterInAppWebViewPlatformReady", (event) => {
+            // this.interval = setInterval(() => {
+            this.send("Help me urgent");
+            // }, 5000);
+          });
+        },
+        methods: {
+          send(m) {
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            window.flutter_inappwebview
+              .callHandler("getcurrentlocation", {})
+              .then((res) => {
+                res["message"] = m;
+                const raw = JSON.stringify(res);
+                const requestOptions = {
+                  method: "POST",
+                  headers: myHeaders,
+                  body: raw,
+                  redirect: "follow",
+                };
+                fetch("/sos/location", requestOptions)
+                  .then((response) => {
+                    console.log("response.text()", response.text());
+                  })
+                  .then((result) => {
+                    this.items = result;
+                  })
+                  .catch((error) => console.error("error", error));
+              })
+              .catch((err) => {
+                console.error('err',err);
+              });
+          },
+        },
+        destroyed() {
+          // clearInterval(this.interval);
+        },
+      });
+    </script>
+  </body>
+</html>

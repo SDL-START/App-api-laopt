@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>COVID-19 PT CARE INSURANCE POLICY SCHEDULE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- <script src="qr-code.js"></script> -->
+    <style type="text/css" media="print">
+      table tbody tr, table tbody th, table tbody td,
+      table thead tr, table thead th, table thead td,
+      table tfoot tr, table tfoot th, table tfoot td{
+        border-color: #000 !important;
+        font-size: 0.85rem !important;
+      }
+      @page  {
+        size: A4;
+        margin: 0 5rem;
+      }
+
+      @media print {
+        @page  {
+          margin-top: 0;
+          margin-bottom: 0;
+        }
+        body{
+          padding-top: 2rem;
+          padding-bottom: 2rem;
+        }
+      }
+    </style>
+    <%
+      function formatMoney(amount) {
+        if (!amount) amount = 0;
+        if (typeof amount === 'string') {
+          amount = parseFloat(amount)
+        }
+        const amt = amount.toLocaleString('de-DE', {
+          style: 'currency',
+          currency: 'LAK',
+          currencyDisplay: 'symbol',
+          minimumFractionDigits: 2
+        });
+        let symbol = '₭'
+        return `${amt.split('LAK')[0].trim()}`;
+      }
+    %>
+  </head>
+  <body class="px-2">
+    <div class="flex border-b border-b-black">
+      <div class="flex-1">
+        <img src="images/logo-insurance.png" alt="" class="h-20" />
+      </div>
+      <div class="flex-auto">
+        <h1 class="text-xl font-bold text-center">COVID-19 PT CARE</h1>
+        <h1 class="text-xl font-bold text-center">INSURANCE</h1>
+        <h1 class="text-xl font-bold text-center">POLICY SCHEDULE</h1>
+      </div>
+      <div class="flex-1"></div>
+    </div>
+
+    <h4 class="pt-4 pb-2 font-bold">INSURED INFORMATION:</h4>
+    <table class="w-full" cellspacing="0" cellpadding="0">
+      <tbody>
+        <tr>
+          <td style="width: 20%" class="px-2 py-0.5 border bg-gray-100">Name:</td>
+          <td style="width: 30%" class="px-2 py-0.5 font-bold border"><%= certificate['user']['firstname']%></td>
+          <td style="width: 20%; vertical-align: baseline;" class="px-2 py-2 border" rowspan="9">
+            <div class="font-bold text-center bg-gray-100">Policy# <%= certificate['no']%></div>
+            <div>
+              <img src="https://chart.googleapis.com/chart?cht=qr&chs=180x180&chld=L|0&chl=<%= certificate['no']%>&choe=UTF-8" class="" alt="" style="margin: 0 auto" />
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="px-2 py-0.5 border bg-gray-100">Surname:</td>
+          <td class="px-2 py-0.5 font-bold border"><%= certificate['user']['lastname'] %></td>
+        </tr>
+        <tr>
+          <td class="px-2 py-0.5 border bg-gray-100">Passport No:</td>
+          <td class="px-2 py-0.5 font-bold border"><%= certificate['user']['passport'] %></td>
+        </tr>
+        <tr>
+          <td class="px-2 py-0.5 border bg-gray-100">Nationality:</td>
+          <td class="px-2 py-0.5 font-bold border"><%= certificate['user']['countrycode'] %></td>
+        </tr>
+        <tr>
+          <td class="px-2 py-0.5 border bg-gray-100">Date of Birth:</td>
+          <td class="px-2 py-0.5 font-bold border"><%= certificate['user']['dob'] %></td>
+        </tr>
+        <tr>
+          <td class="px-2 py-0.5 border bg-gray-100">Phone:</td>
+          <td class="px-2 py-0.5 font-bold border"><%= certificate['user']['phone'] %></td>
+        </tr>
+        <tr>
+          <td class="px-2 py-0.5 border bg-gray-100">Email:</td>
+          <td class="px-2 py-0.5 font-bold border"><%= certificate['user']['email'] %></td>
+        </tr>
+        <tr>
+          <td class="px-2 py-0.5 border bg-gray-100">Occupation:</td>
+          <td class="px-2 py-0.5 font-bold border"></td>
+        </tr>
+        <tr>
+          <td class="px-2 py-0.5 border bg-gray-100">Address</td>
+          <td class="px-2 py-0.5 font-bold border"><%= certificate['user']['address'] %></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4 class="pt-3 pb-2 font-bold">DETAIL OF COMPENSATION</h4>
+    <table class="w-full border">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="px-2 py-0.5 border">Cover Description</th>
+          <th class="px-2 py-0.5 border">Amount of Cover (LAK)</th>
+          <th class="px-2 py-0.5 border">Premium (LAK)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="px-2 py-0.5 border">
+            <div>1) Medical Expenses</div>
+          </td>
+          <td class="px-2 py-0.5 border">
+            <div class="h-6"></div>
+          </td>
+          <td class="px-2 py-0.5 text-center border" rowspan="6">Included</td>
+        </tr>
+        <tr>
+          <td class="px-2 py-0.5 border">
+            <div class="px-8">1st Infection</div>
+          </td>
+          <td class="px-2 py-0.5 border">
+            <div class="text-right">3,000,000</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="px-2 py-0.5 border">
+            <div class="px-8">2nd Infection</div>
+          </td>
+          <td class="px-2 py-0.5 border">
+            <div class="text-right">5,000,000</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="px-2 py-0.5 border">
+            <div class="px-8">3rd Infection</div>
+          </td>
+          <td class="px-2 py-0.5 border">
+            <div class="text-right">10,000,000</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="px-2 py-0.5 border">
+            <div>2) Loss of Life Compensation</div>
+          </td>
+          <td class="px-2 py-0.5 border">
+            <div class="text-right">32,000,000</div>
+          </td>
+        </tr>
+        <tr>
+          <td class="px-2 py-0.5 border">
+            <div class="font-bold">Total Compensation</div>
+          </td>
+          <td class="px-2 py-0.5 border">
+            <div class="text-right">50,000,000</div>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot class="bg-gray-200">
+        <tr>
+          <th style="border-color: #000 !important;" class="text-right" colspan="2">Total</th>
+          <th class="text-right"><%= formatMoney(certificate['amount']) %> LAK</th>
+        </tr>
+      </tfoot>
+    </table>
+
+    <h4 class="pt-3 pb-2 font-bold">EXCHANGE RATE</h4>
+    <table class="w-full">
+      <tbody>
+        <tr>
+          <td class="px-2 py-0.5 border">Premium in USD</td>
+          <td class="px-4 text-right border">30 USD</td>
+        </tr>
+        <tr>
+          <td class="px-2 py-0.5 border">Premium in THB</td>
+          <td class="px-4 text-right border">1000 THB</td>
+        </tr>
+        <tr>
+          <td class="px-2 py-0.5 border">Premium in VND</td>
+          <td class="px-4 text-right border">615,000 VND</td>
+        </tr>
+        <tr>
+          <td class="px-2 py-0.5 border">Premium in RBM</td>
+          <td class="px-4 text-right border">200 RMB</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="my-4"></div>
+    <table class="w-full">
+      <tbody>
+        <tr>
+          <th class="border" rowspan="2">Cover Period (<%= certificate['expirymonth'] %> Months):</th>
+          <th class="border">Inception Date</th>
+          <th class="border">Expired Date</th>
+        </tr>
+        <tr>
+          <td class="text-center border"><%= certificate['createdtime'] %></td>
+          <td class="text-center border"><%= certificate['expiredtime'] %></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="flex mt-1 mb-4">
+      <div class="flex-1">Channel:</div>
+      <div class="flex-1">&#9744; LIA</div>
+      <div class="flex-1">&#9744; LIP</div>
+      <div class="flex-1">&#9744; Agent</div>
+    </div>
+
+    <table class="w-full">
+      <tbody>
+        <tr>
+          <th class="pb-32 text-center border">Insee Life Insurance Co., Ltd</th>
+          <th class="pb-32 text-center border">Thavisub Insurance Borker Co., Ltd</th>
+          <th class="pb-32 text-center border">
+            <div>Insured:</div>
+            <div class="font-bold"><%= certificate['user']['firstname'] %> <%= certificate['user']['lastname'] %></div>
+          </th>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+  <script>
+    window.print();
+  </script>
+</html>

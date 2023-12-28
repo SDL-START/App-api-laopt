@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `visatype` ADD COLUMN `deleted` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `description` VARCHAR(191) NULL,
+    ADD COLUMN `status` ENUM('ACTIVE', 'HIDDEN') NOT NULL DEFAULT 'ACTIVE';
