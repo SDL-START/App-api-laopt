@@ -51,7 +51,7 @@ model certificatemember {
   gender         certificatemember_gender?
   photo          Json?
   passport       String?                    @db.VarChar(200)
-  
+  visatype_id    Int
   certificate    certificate                @relation(fields: [certificate_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_certificatemember_certificate1")
 
   @@index([certificate_id], map: "fk_certificatemember_certificate1_idx")

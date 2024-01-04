@@ -89,9 +89,9 @@ app.use("/certificate", auth, require("./routes/certificate"));
 app.use("/myinsurance", auth, require("./routes/myinsurance"));
 app.use("/claim", auth, require("./routes/claim"));
 app.use("/sos", auth, require("./routes/sos"));
-app.use("/sosservice",auth, require("./routes/sos/sos_services"));
-app.use("/sosmessage",auth,require("./routes/sos/message"));
-app.use("/location",auth,require("./routes/sos/location"));
+app.use("/sosservice", auth, require("./routes/sos/sos_services"));
+app.use("/sosmessage", auth, require("./routes/sos/message"));
+app.use("/location", auth, require("./routes/sos/location"));
 
 //staff
 app.use("/staff", auth, require("./routes/staff"));
@@ -106,7 +106,7 @@ app.use("/admin/user", auth, require("./routes/admin/user"));
 app.use("/admin/report", auth, require("./routes/admin/report"));
 app.use("/admin/helpcenter", auth, require("./routes/admin/helpcenter"));
 
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 8800;
 const server = app.listen(port, () => {
   logger.debug(`APP SERVER STARTED ON PORT ${port}`);
 });
